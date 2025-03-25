@@ -111,6 +111,7 @@
 
 # 评价标准
 
+- 已实现MSE，LSiM的代码和模型已经准备好
 - a mean-squared-error (MSE) and LSiM, a similaritymetric for numerical simulations (Kohl et al. 2020, also see Appendix D).
 - Benchmarking Autoregressive Conditional Diffusion Models for Turbulent Flow Simulation
   - **后验采样 (Posterior Sampling)**:
@@ -132,7 +133,7 @@
 
 2. 加速优化
 
-   问题：目前只使用到cpu进行计算，加速效果不明显，考虑简化模型结构和深度
+   问题：目前openfoam和ml只使用到cpu进行计算，加速效果不明显，考虑简化模型结构和深度
 
 3. 评估标准和比较
 
@@ -141,14 +142,30 @@
 4. dambreak案例中加入模型查看效果
 
    问题：现在的案例是一个块，但dambreak案例是多个块组成，转化成cnn时数据的布局应该怎么考虑
+         一个块相当于一个可变型立方体。
+   -blocks
+    (
+        hex (0 1 2 3 4 5 6 7) (30 30 1) simpleGrading (1 1 1)
+    );
+   -blocks
+    (
+        hex (0 1 5 4 12 13 17 16) (23 8 1) simpleGrading (1 1 1)
+        hex (2 3 7 6 14 15 19 18) (19 8 1) simpleGrading (1 1 1)
+        hex (4 5 9 8 16 17 21 20) (23 42 1) simpleGrading (1 1 1)
+        hex (5 6 10 9 17 18 22 21) (4 42 1) simpleGrading (1 1 1)
+        hex (6 7 11 10 18 19 23 22) (19 42 1) simpleGrading (1 1 1)
+    );
+
 
 
 
 # 已实现
 
 1. 将面场投射到体积场，统一数据：将phi投射成phi_cell，处理nan值
+  原因：面场和体积场的数据长度不同，面场表示的相当于是四边形的边，体积场表示的是四边形的中心。根据gpt的提示，按照openfoam的数据定义进行转化
 
 2. 重构并裁剪数据：按百分比裁剪，并标准化数据，以达到减少数值单位影响的目的；将一维数据转化成适合CNN训练的二维数据
+  原因：裁剪是因为数据输出时存在极大或极小的数据，影响数据质量
 
 3. 模型搭建
 
